@@ -32,8 +32,8 @@
     },
     "variables": {
         "nicName1": "valis-VM1-NIC",
-        "addressPrefix": "10.1.0.0/16",
         "publicIPAddressName1": "valis-VM1-PublicIP",
+        "addressPrefix": "10.1.0.0/16",
         "subnetName": "Subnet",
         "subnetPrefix": "10.1.0.0/24",
         "vmName1": "valis-VM1",
