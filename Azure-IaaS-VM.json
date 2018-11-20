@@ -60,7 +60,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 100,
+                            "priority": 1500,
                             "direction": "Inbound"
                         }
                     },
@@ -74,7 +74,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 110,
+                            "priority": 1510,
                             "direction": "Outbound"
                         }
                     },
@@ -88,7 +88,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 120,
+                            "priority": 1520,
                             "direction": "Inbound"
                         }
                     },
@@ -102,7 +102,7 @@
                             "sourceAddressPrefix": "*",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
-                            "priority": 130,
+                            "priority": 1530,
                             "direction": "Outbound"
                         }
                     }
@@ -225,6 +225,29 @@
                     ]
                 }
             }
-        }
+        },
+        {
+            "apiVersion": "2015-06-15",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "valis-VM1/config-iis-server",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', variables('vmName1'))]"
+            ],
+            "properties": {
+              "publisher": "Microsoft.Compute",
+              "type": "CustomScriptExtension",
+              "typeHandlerVersion": "1.9",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "https://raw.githubusercontent.com/MadarsSmits/azure-iaas/scripts/iis-web-server.ps1"
+                ]
+              },
+              "protectedSettings": {
+                "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File iis-web-server.ps1"
+              }
+            }
+          }
     ]
 }
