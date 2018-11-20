@@ -138,6 +138,7 @@
                 "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
             ],
             "properties": {
+                "mode": "Incremental",
                 "addressSpace": {
                     "addressPrefixes": [
                         "[variables('addressPrefix')]"
