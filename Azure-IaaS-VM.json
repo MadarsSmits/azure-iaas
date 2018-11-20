@@ -184,7 +184,7 @@
             }
         },
         {
-            "apiVersion": "2018-06-01",
+            "apiVersion": "2017-12-01",
             "type": "Microsoft.Compute/virtualMachines",
             "name": "[variables('vmName1')]",
             "location": "[parameters('location')]",
@@ -197,7 +197,7 @@
                     "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySetName'))]"
                 },
                 "hardwareProfile": {
-                    "vmSize": "Standard_F2S_v2"
+                    "vmSize": "Standard_F2s_v2"
                 },
                 "osProfile": {
                     "computerName": "[variables('vmName1')]",
