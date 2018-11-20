@@ -14,41 +14,143 @@
             "metadata": {
                 "description": "Password for the Virtual Machine."
             }
+        },
+        "windowsOSVersion": {
+            "type": "string",
+            "defaultValue": "2016-Datacenter",
+            "metadata": {
+                "description": "The Windows version for the VM. This will pick a fully patched image of this given Windows version."
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "[resourceGroup().location]",
+            "metadata": {
+                "description": "Location for all resources."
+            }
         }
     },
     "variables": {
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks','myVNet')]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/mySubnet')]"
+        "nicName1": "valis-VM1-NIC",
+        "addressPrefix": "10.1.0.0/16",
+        "publicIPAddressName1": "valis-VM1-PublicIP",
+        "subnetName": "Subnet",
+        "subnetPrefix": "10.1.0.0/24",
+        "vmName1": "valis-VM1",
+        "virtualNetworkName": "valis-VNET",
+        "nsgName": "valis-NSG",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
+        "availabilitySetName": "valis-HA"
     },
     "resources": [
         {
-            "apiVersion": "2016-03-30",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "myPublicIPAddress",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[variables('nsgName')]",
+            "location": "[parameters('location')]",
+            "apiVersion": "2017-06-01",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "RDP_In",
+                        "properties": {
+                            "description": "Allows RDP traffic",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "RDP_Out",
+                        "properties": {
+                            "description": "Allows RDP traffic",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 110,
+                            "direction": "Outbound"
+                        }
+                    },
+                    {
+                        "name": "HTTP_in",
+                        "properties": {
+                            "description": "Allows HTTP traffic",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 120,
+                            "direction": "Inbound"
+                        }
+                    },
+                    {
+                        "name": "HTTP_out",
+                        "properties": {
+                            "description": "Allows HTTP traffic",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 130,
+                            "direction": "Outbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('availabilitySetName')]",
+            "apiVersion": "2016-04-30-preview",
             "location": "[resourceGroup().location]",
             "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "myresourcegroupdns1"
-                }
+                "platformFaultDomainCount": 2,
+                "platformUpdateDomainCount": 2,
+                "managed": true
+            }
+        },
+        {
+            "apiVersion": "2016-03-30",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('publicIPAddressName1')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic"
             }
         },
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "myVNet",
-            "location": "[resourceGroup().location]",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
+            ],
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "10.0.0.0/16"
+                        "[variables('addressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "mySubnet",
+                        "name": "[variables('subnetName')]",
                         "properties": {
-                            "addressPrefix": "10.0.0.0/24"
+                            "addressPrefix": "[variables('subnetPrefix')]",
+                            "networkSecurityGroup": {
+                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]"
+                            }
                         }
                     }
                 ]
@@ -57,11 +159,12 @@
         {
             "apiVersion": "2016-03-30",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "myNic",
-            "location": "[resourceGroup().location]",
+            "name": "[variables('nicName1')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIPAddresses/', 'myPublicIPAddress')]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', 'myVNet')]"
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('nsgName'))]",
+                "[resourceId('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName1'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -70,7 +173,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses','myPublicIPAddress')]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName1'))]"
                             },
                             "subnet": {
                                 "id": "[variables('subnetRef')]"
@@ -81,19 +184,23 @@
             }
         },
         {
-            "apiVersion": "2016-04-30-preview",
+            "apiVersion": "2018-06-01",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "myVM",
-            "location": "[resourceGroup().location]",
+            "name": "[variables('vmName1')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces/', 'myNic')]"
+                "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName1'))]",
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]"
             ],
             "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets',variables('availabilitySetName'))]"
+                },
                 "hardwareProfile": {
-                    "vmSize": "Standard_DS1"
+                    "vmSize": "Standard_F2S_v2"
                 },
                 "osProfile": {
-                    "computerName": "myVM",
+                    "computerName": "[variables('vmName1')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
@@ -101,7 +208,7 @@
                     "imageReference": {
                         "publisher": "MicrosoftWindowsServer",
                         "offer": "WindowsServer",
-                        "sku": "2012-R2-Datacenter",
+                        "sku": "[parameters('windowsOSVersion')]",
                         "version": "latest"
                     },
                     "osDisk": {
@@ -113,7 +220,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces','myNic')]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces/', variables('nicName1'))]"
                         }
                     ]
                 }
