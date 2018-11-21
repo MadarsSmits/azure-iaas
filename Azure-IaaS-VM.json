@@ -241,7 +241,7 @@
               "autoUpgradeMinorVersion": true,
               "settings": {
                 "fileUris": [
-                  "https://raw.githubusercontent.com/MadarsSmits/azure-iaas/scripts/iis-web-server.ps1"
+                  "https://raw.githubusercontent.com/MadarsSmits/azure-iaas/master/scripts/iis-web-server.ps1"
                 ]
               },
               "protectedSettings": {
