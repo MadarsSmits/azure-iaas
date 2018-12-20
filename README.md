@@ -2,9 +2,9 @@
 Azure Workshop "Valis v0.1"
 
 ---------------
-Template "Azure-IaaS-VM.json"
+Template "template.json"
 ---------------
-az group deployment create --template-uri https://raw.githubusercontent.com/MadarsSmits/azure-iaas/master/Azure-IaaS-VM.json --verbose --resource-group valis --debug
+az group deployment create --template-uri https://raw.githubusercontent.com/MadarsSmits/azure-iaas/master/template.json --verbose --resource-group valis1 --debug
 
 - valis-VM1 VM
 - valis-VM1 OS Disk

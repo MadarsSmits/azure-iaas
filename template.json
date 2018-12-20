@@ -31,16 +31,16 @@
         }
     },
     "variables": {
-        "nicName1": "valis-VM1-NIC",
-        "publicIPAddressName1": "valis-VM1-PublicIP",
+        "nicName1": "valis1-VM1-NIC",
+        "publicIPAddressName1": "valis1-VM1-PublicIP",
         "addressPrefix": "10.1.0.0/16",
         "subnetName": "Subnet",
         "subnetPrefix": "10.1.0.0/24",
-        "vmName1": "valis-VM1",
-        "virtualNetworkName": "valis-VNET",
-        "nsgName": "valis-NSG",
+        "vmName1": "valis1-VM1",
+        "virtualNetworkName": "valis1-VNET",
+        "nsgName": "valis1-NSG",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
-        "availabilitySetName": "valis-HA"
+        "availabilitySetName": "valis1-HA"
     },
     "resources": [
         {
@@ -229,7 +229,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "valis-VM1/config-iis-server",
+            "name": "valis1-VM1/config-iis-server",
             "location": "[parameters('location')]",
             "dependsOn": [
               "[concat('Microsoft.Compute/virtualMachines/', variables('vmName1'))]"
