@@ -4,8 +4,12 @@ Azure Workshop "Valis v0.1"
 ---------------
 Template "template.json"
 ---------------
-az group create --name valis1 --location "westeurope" --verbose  
+```
+az group create --name valis1 --location "westeurope" --verbose
+```
+```
 az group deployment create --template-uri https://raw.githubusercontent.com/MadarsSmits/azure-iaas/master/template.json --verbose --resource-group valis1 --debug
+```
 
 - valis1-VM1
 - valis1-VM1-OS-DISK
